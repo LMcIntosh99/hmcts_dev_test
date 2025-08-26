@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -58,6 +59,17 @@ class TaskServiceTest {
     }
     
     @Test
+    void testUpdateStatus_NotFound() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> taskService.updateStatus(1L, Task.Status.COMPLETED))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Task not found");
+
+        verify(taskRepository, never()).save(any(Task.class));
+    }
+    
+    @Test
     void testGetTaskById() {
         Task task = new Task();
         task.setId(1L);
@@ -75,11 +87,40 @@ class TaskServiceTest {
     
     @Test
     void testGetTaskById_NotFound() {
-        when(taskRepository.findById(99L)).thenReturn(Optional.empty());
+        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
         Optional<Task> result = taskService.getTaskById(99L);
 
         assertThat(result).isNotPresent();
         verify(taskRepository, times(1)).findById(99L);
+    }
+    
+    @Test
+    void testGetAllTasks() {
+        Task task1 = new Task();
+        task1.setId(1L);
+        task1.setTitle("Task 1");
+
+        Task task2 = new Task();
+        task2.setId(2L);
+        task2.setTitle("Task 2");
+
+        when(taskRepository.findAll()).thenReturn(List.of(task1, task2));
+
+        List<Task> result = taskService.getAllTasks();
+
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(Task::getTitle)
+                          .containsExactly("Task 1", "Task 2");
+        verify(taskRepository, times(1)).findAll();
+    }
+
+    @Test
+    void testDeleteTask() {
+        doNothing().when(taskRepository).deleteById(1L);
+
+        taskService.deleteTask(1L);
+
+        verify(taskRepository, times(1)).deleteById(1L);
     }
 }

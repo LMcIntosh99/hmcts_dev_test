@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -74,7 +75,7 @@ class TaskControllerTest {
 
 
     @Test
-    void testGetTaskById() throws Exception {
+    void testGetTask() throws Exception {
         Task task = new Task();
         task.setId(1L);
         task.setTitle("Fetch Me");
@@ -84,6 +85,20 @@ class TaskControllerTest {
         mockMvc.perform(get("/api/tasks/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Fetch Me"));
+    }
+    
+    @Test
+    void testGetTask_NotFound() throws Exception {
+        // Mock the service to return empty for a non-existing task
+        when(taskService.getTaskById(99L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/tasks/99"))
+                .andExpect(status().isInternalServerError()) // Because RuntimeException by default gives 500
+                .andExpect(result -> assertThat(result.getResolvedException())
+                        .isInstanceOf(RuntimeException.class)
+                        .hasMessage("Task not found"));
+
+        verify(taskService, times(1)).getTaskById(99L);
     }
 
     @Test
