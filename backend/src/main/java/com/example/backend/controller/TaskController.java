@@ -36,13 +36,13 @@ public class TaskController {
 
     // Update Status
     @PatchMapping("/{id}/status")
-    public Task updateStatus(@PathVariable Long id, @RequestParam Task.Status status) {
+    public Task updateStatus(@PathVariable("id") Long id, @RequestParam("status") Task.Status status) {
         return taskService.updateStatus(id, status);
     }
 
     // Delete Task
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id) {
+    public void deleteTask(@PathVariable("id") Long id) {
         taskService.deleteTask(id);
     }
 }
