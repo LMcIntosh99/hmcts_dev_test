@@ -42,4 +42,22 @@ public class TaskService {
     public List<Task> getTasksByStatus(Task.Status status) {
         return taskRepository.findByStatus(status);
     }
+    
+    public Task updateTask(Long id, Task updatedTask) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
+
+        if (updatedTask.getTitle() != null) {
+            task.setTitle(updatedTask.getTitle());
+        }
+        if (updatedTask.getDescription() != null) {
+            task.setDescription(updatedTask.getDescription());
+        }
+        if (updatedTask.getDueDateTime() != null) {
+            task.setDueDateTime(updatedTask.getDueDateTime());
+        }
+
+        return taskRepository.save(task);
+    }
+
 }

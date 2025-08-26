@@ -155,4 +155,38 @@ class TaskServiceTest {
 
         verify(taskRepository, times(1)).findByStatus(Task.Status.COMPLETED);
     }
+    
+    @Test
+    void testUpdateTask() {
+    	Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Test Task");
+        task.setStatus(Task.Status.PENDING);
+        
+        Task updatedTask = task;
+        updatedTask.setTitle("New Task Title");
+        updatedTask.setDescription("Updated description");
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+        when(taskRepository.save(updatedTask)).thenReturn(updatedTask);
+        
+        Task result = taskService.updateTask(1L, updatedTask);
+
+        assertThat(result.getTitle()).isEqualTo("New Task Title");
+        assertThat(result.getDescription()).isEqualTo("Updated description");
+        assertThat(result.getStatus()).isEqualTo(Task.Status.PENDING);
+        verify(taskRepository, times(1)).save(task);
+    }
+
+    
+    @Test
+    void testUpdateTask_NotFound() {
+        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> taskService.updateTask(1L, new Task()))
+                .isInstanceOf(TaskNotFoundException.class)
+                .hasMessage("Task not found");
+
+        verify(taskRepository, never()).save(any(Task.class));
+    }
 }
