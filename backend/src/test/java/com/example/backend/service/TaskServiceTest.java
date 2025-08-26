@@ -56,4 +56,20 @@ class TaskServiceTest {
         assertThat(result.getStatus()).isEqualTo(Task.Status.COMPLETED);
         verify(taskRepository, times(1)).save(task);
     }
+    
+    @Test
+    void testGetTaskById() {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Fetch Me");
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+
+        Optional<Task> result = taskService.getTaskById(1L);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(1L);
+        assertThat(result.get().getTitle()).isEqualTo("Fetch Me");
+        verify(taskRepository, times(1)).findById(1L);
+    }
 }
