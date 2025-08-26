@@ -38,4 +38,8 @@ public class TaskService {
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
     }
+    
+    public List<Task> getTasksByStatus(Task.Status status) {
+        return taskRepository.findByStatus(status);
+    }
 }

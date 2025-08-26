@@ -164,12 +164,13 @@ class TaskControllerTest {
         task3.setStatus(Task.Status.COMPLETED);
 
         List<Task> completedTasks = List.of(task, task3);
-        when(taskService.getTasksByStatus(Task.Status.COMPLETED)).thenReturn(Optional.of(completedTasks));
+        when(taskService.getTasksByStatus(Task.Status.COMPLETED)).thenReturn(completedTasks);
 
         mockMvc.perform(get("/api/tasks/status/{status}", "COMPLETED"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].title").value("Completed Task"))
-        .andExpect(jsonPath("$[1].title").value("Completed Task 2"));
+        .andExpect(jsonPath("$[1].title").value("Completed Task 2"))
+        .andExpect(jsonPath("$.length()").value(2));
     }
     
 }

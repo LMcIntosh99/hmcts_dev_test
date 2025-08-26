@@ -124,4 +124,35 @@ class TaskServiceTest {
 
         verify(taskRepository, times(1)).deleteById(1L);
     }
+    
+    @Test
+    void testGetTasksByStatus() {
+    	Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Completed Task");
+        task.setStatus(Task.Status.COMPLETED);
+        
+        Task task2 = new Task();
+        task2.setId(2L);
+        task2.setTitle("In Progress Task");
+        task2.setStatus(Task.Status.IN_PROGRESS);
+        
+        Task task3 = new Task();
+        task3.setId(3L);
+        task3.setTitle("Completed Task 2");
+        task3.setStatus(Task.Status.COMPLETED);
+
+        List<Task> completedTasks = List.of(task, task3);
+
+        when(taskRepository.findByStatus(Task.Status.COMPLETED)).thenReturn(completedTasks);
+
+        List<Task> result = taskService.getTasksByStatus(Task.Status.COMPLETED);
+
+        assertThat(result)
+            .hasSize(2)
+            .extracting(Task::getTitle)
+            .containsExactly("Completed Task", "Completed Task 2");
+
+        verify(taskRepository, times(1)).findByStatus(Task.Status.COMPLETED);
+    }
 }

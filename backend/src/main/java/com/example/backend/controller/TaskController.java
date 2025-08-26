@@ -46,4 +46,11 @@ public class TaskController {
     public void deleteTask(@PathVariable("id") Long id) {
         taskService.deleteTask(id);
     }
+
+    // Get Tasks by Status
+    @GetMapping("/status/{status}")
+    public List<Task> getTasksByStatus(@PathVariable("status") Task.Status status) {
+        return taskService.getTasksByStatus(status);
+    }
+
 }
