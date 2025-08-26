@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.exception.TaskNotFoundException;
 import com.example.backend.model.Task;
 import com.example.backend.service.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,16 +90,15 @@ class TaskControllerTest {
     
     @Test
     void testGetTask_NotFound() throws Exception {
-        // Mock the service to return empty for a non-existing task
-        when(taskService.getTaskById(99L)).thenReturn(Optional.empty());
+        when(taskService.getTaskById(1L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/tasks/99"))
-                .andExpect(status().isInternalServerError()) // Because RuntimeException by default gives 500
+        mockMvc.perform(get("/api/tasks/1"))
+                .andExpect(status().isNotFound())
                 .andExpect(result -> assertThat(result.getResolvedException())
-                        .isInstanceOf(RuntimeException.class)
+                        .isInstanceOf(TaskNotFoundException.class)
                         .hasMessage("Task not found"));
 
-        verify(taskService, times(1)).getTaskById(99L);
+        verify(taskService, times(1)).getTaskById(1L);
     }
 
     @Test

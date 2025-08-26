@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.exception.TaskNotFoundException;
 import com.example.backend.model.Task;
 import com.example.backend.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +64,7 @@ class TaskServiceTest {
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> taskService.updateStatus(1L, Task.Status.COMPLETED))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(TaskNotFoundException.class)
                 .hasMessage("Task not found");
 
         verify(taskRepository, never()).save(any(Task.class));

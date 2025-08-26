@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.exception.TaskNotFoundException;
 import com.example.backend.model.Task;
 import com.example.backend.service.TaskService;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class TaskController {
     // Get Task by ID
     @GetMapping("/{id}")
     public Task getTask(@PathVariable("id") Long id) {
-        return taskService.getTaskById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+        return taskService.getTaskById(id).orElseThrow(() -> new TaskNotFoundException("Task not found"));
     }
     
 

@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.exception.TaskNotFoundException;
 import com.example.backend.model.Task;
 import com.example.backend.repository.TaskRepository;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class TaskService {
 
     public Task updateStatus(Long id, Task.Status newStatus) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
         task.setStatus(newStatus);
         return taskRepository.save(task);
     }
