@@ -11,12 +11,12 @@ const TaskList: React.FC = () => {
   });
 
   const fetchTasks = async () => {
-    const res = await getTasks(); // fetch ALL tasks
+    const res = await getTasks();
     setTasks(res.data);
   };
 
   const handleStatusChange = async (id: number, status: Task["status"] | "NONE") => {
-    if (status === "NONE") return; // do nothing if "Change status" is chosen
+    if (status === "NONE") return;
     await updateTaskStatus(id, status);
     fetchTasks();
   };
@@ -47,9 +47,14 @@ const TaskList: React.FC = () => {
           </button>
         )}
         {task.status === "IN_PROGRESS" && (
-          <button onClick={() => handleStatusChange(task.id!, "COMPLETED")}>
-            Complete Task
-          </button>
+          <>
+            <button onClick={() => handleStatusChange(task.id!, "COMPLETED")}>
+              ✅
+            </button>
+            <button onClick={() => handleStatusChange(task.id!, "PENDING")}>
+              Pause Progress
+            </button>
+          </>
         )}
         {task.status === "COMPLETED" && (
           <select
@@ -58,7 +63,7 @@ const TaskList: React.FC = () => {
             }
             defaultValue="NONE"
           >
-            <option value="NONE">Change status</option>
+            <option value="NONE">Change Status</option>
             <option value="PENDING">Pending</option>
             <option value="IN_PROGRESS">In Progress</option>
           </select>
