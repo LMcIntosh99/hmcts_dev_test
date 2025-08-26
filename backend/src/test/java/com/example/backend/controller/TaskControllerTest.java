@@ -173,4 +173,39 @@ class TaskControllerTest {
         .andExpect(jsonPath("$.length()").value(2));
     }
     
+    @Test
+    void testUpdateTask() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Task");
+        task.setStatus(Task.Status.PENDING);
+        task.setDueDateTime(LocalDateTime.now());
+
+        LocalDateTime newDueDate = LocalDateTime.of(2025, 10, 26, 12, 0);
+        
+        Task updatedTask = new Task();
+        updatedTask.setId(1L);
+        updatedTask.setTitle("New Task Title");
+        updatedTask.setDescription("Updated description");
+        updatedTask.setDueDateTime(newDueDate);
+
+        when(taskService.updateTask(eq(task.getId()), any(Task.class)))
+                .thenReturn(updatedTask);
+
+        mockMvc.perform(patch("/api/tasks/{id}", task.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "title": "New Task Title",
+                            "description": "Updated description",
+                            "dueDateTime": "2025-10-26T12:00:00"
+                        }
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(task.getId()))
+                .andExpect(jsonPath("$.title").value("New Task Title"))
+                .andExpect(jsonPath("$.description").value("Updated description"));
+        verify(taskService, times(1)).updateTask(eq(task.getId()), any(Task.class));
+    }
+    
 }

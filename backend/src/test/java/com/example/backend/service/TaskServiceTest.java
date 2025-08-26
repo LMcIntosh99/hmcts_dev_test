@@ -162,10 +162,13 @@ class TaskServiceTest {
         task.setId(1L);
         task.setTitle("Test Task");
         task.setStatus(Task.Status.PENDING);
-        
+        task.setDueDateTime(LocalDateTime.now());
+
+        LocalDateTime newDueDate = LocalDateTime.of(2025, 10, 26, 12, 0);
         Task updatedTask = task;
         updatedTask.setTitle("New Task Title");
         updatedTask.setDescription("Updated description");
+        updatedTask.setDueDateTime(newDueDate);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
         when(taskRepository.save(updatedTask)).thenReturn(updatedTask);
@@ -175,6 +178,7 @@ class TaskServiceTest {
         assertThat(result.getTitle()).isEqualTo("New Task Title");
         assertThat(result.getDescription()).isEqualTo("Updated description");
         assertThat(result.getStatus()).isEqualTo(Task.Status.PENDING);
+        assertThat(result.getDueDateTime()).isEqualTo(newDueDate);
         verify(taskRepository, times(1)).save(task);
     }
 
