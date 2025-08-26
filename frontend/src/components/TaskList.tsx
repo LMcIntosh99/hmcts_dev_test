@@ -49,14 +49,14 @@ const TaskList: React.FC = () => {
         <h2>Pending Tasks</h2>
         {pendingTasks.map((task) => (
           <li key={task.id}>
-            <strong>{task.title}</strong> - {task.status} - Due:{" "}
+            <strong>{task.title}</strong> - Due:{" "}
             {task.dueDateTime}
             <button
               onClick={() =>
                 handleStatusChange(task.id!, nextStatus(task.status))
               }
             >
-              Toggle Status
+              Start Task
             </button>
             <button onClick={() => handleDelete(task.id!)}>Delete</button>
             <p>{task.description}</p>
@@ -65,14 +65,14 @@ const TaskList: React.FC = () => {
         <h2>In Progress Tasks</h2>
         {inProgressTasks.map((task) => (
           <li key={task.id}>
-            <strong>{task.title}</strong> - {task.status} - Due:{" "}
+            <strong>{task.title}</strong> - Due:{" "}
             {task.dueDateTime}
             <button
               onClick={() =>
                 handleStatusChange(task.id!, nextStatus(task.status))
               }
             >
-              Toggle Status
+              Complete Task
             </button>
             <button onClick={() => handleDelete(task.id!)}>Delete</button>
             <p>{task.description}</p>
@@ -81,8 +81,7 @@ const TaskList: React.FC = () => {
         <h2>Completed Tasks</h2>
         {completedTasks.map((task) => (
           <li key={task.id}>
-            <strong>{task.title}</strong> - {task.status} - Due:{" "}
-            {task.dueDateTime}
+            <strong>{task.title}</strong>
             <button
               onClick={() =>
                 handleStatusChange(task.id!, nextStatus(task.status))
