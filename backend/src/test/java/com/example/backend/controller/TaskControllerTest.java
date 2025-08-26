@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -48,6 +48,30 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("New Task"));
     }
+    
+    @Test
+    void testDeleteTask() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("New Task");
+        task.setStatus(Task.Status.PENDING);
+        task.setDueDateTime(LocalDateTime.now());
+
+        when(taskService.createTask(any(Task.class))).thenReturn(task);
+
+        mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isOk());
+
+        doNothing().when(taskService).deleteTask(task.getId());
+
+        mockMvc.perform(delete("/api/tasks/{id}", task.getId()))
+                .andExpect(status().isOk());
+
+        verify(taskService, times(1)).deleteTask(task.getId());
+    }
+
 
     @Test
     void testGetTaskById() throws Exception {
