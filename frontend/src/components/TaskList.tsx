@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Task } from "../types";
-import { getTasksByStatus, updateTaskStatus, deleteTask } from "../api";
+import { getTasks, updateTaskStatus, deleteTask } from "../api";
 
 const TaskList: React.FC = () => {
-  const [pendingTasks, setPendingTasks] = useState<Task[]>([]);
-  const [inProgressTasks, setInProgressTasks] = useState<Task[]>([]);
-  const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const fetchTasks = async () => {
-    const res1 = await getTasksByStatus("PENDING");
-    setPendingTasks(res1.data);
-
-    const res2 = await getTasksByStatus("IN_PROGRESS");
-    setInProgressTasks(res2.data);
-
-    const res3 = await getTasksByStatus("COMPLETED");
-    setCompletedTasks(res3.data);
+    const res = await getTasks(); // fetch ALL tasks
+    setTasks(res.data);
   };
 
   const handleStatusChange = async (id: number, status: Task["status"]) => {
@@ -31,17 +23,6 @@ const TaskList: React.FC = () => {
   useEffect(() => {
     fetchTasks();
   }, []);
-
-  const nextStatus = (status: Task["status"]) => {
-    switch (status) {
-        case "PENDING":
-        return "IN_PROGRESS";
-        case "IN_PROGRESS":
-        return "COMPLETED";
-        case "COMPLETED":
-        return "PENDING";
-    }
-  };  
 
   const renderTask = (task: Task) => (
     <li key={task.id}>
@@ -61,16 +42,22 @@ const TaskList: React.FC = () => {
     </li>
   );
 
+  const groupedTasks = {
+    PENDING: tasks.filter((t) => t.status === "PENDING"),
+    IN_PROGRESS: tasks.filter((t) => t.status === "IN_PROGRESS"),
+    COMPLETED: tasks.filter((t) => t.status === "COMPLETED"),
+  };
+
   return (
     <div>
       <h2>Pending Tasks</h2>
-      <ul>{pendingTasks.map(renderTask)}</ul>
+      <ul>{groupedTasks.PENDING.map(renderTask)}</ul>
 
       <h2>In Progress Tasks</h2>
-      <ul>{inProgressTasks.map(renderTask)}</ul>
+      <ul>{groupedTasks.IN_PROGRESS.map(renderTask)}</ul>
 
       <h2>Completed Tasks</h2>
-      <ul>{completedTasks.map(renderTask)}</ul>
+      <ul>{groupedTasks.COMPLETED.map(renderTask)}</ul>
     </div>
   );
 };
