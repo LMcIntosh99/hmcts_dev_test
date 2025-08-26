@@ -103,4 +103,31 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$[0].title").value("Task 1"))
                 .andExpect(jsonPath("$[1].title").value("Task 2"));
     }
+    
+    @Test
+    void testUpdateStatus() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("New Task");
+        task.setStatus(Task.Status.PENDING);
+        task.setDueDateTime(LocalDateTime.now());
+
+        Task updatedTask = new Task();
+        updatedTask.setId(1L);
+        updatedTask.setTitle("New Task");
+        updatedTask.setStatus(Task.Status.COMPLETED);
+        updatedTask.setDueDateTime(task.getDueDateTime());
+
+        when(taskService.updateStatus(eq(task.getId()), eq(Task.Status.COMPLETED)))
+                .thenReturn(updatedTask);
+
+        mockMvc.perform(patch("/api/tasks/{id}/status", task.getId())
+                .param("status", "COMPLETED"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(task.getId()))
+                .andExpect(jsonPath("$.title").value("New Task"))
+                .andExpect(jsonPath("$.status").value("COMPLETED"));
+
+        verify(taskService, times(1)).updateStatus(task.getId(), Task.Status.COMPLETED);
+    }
 }
