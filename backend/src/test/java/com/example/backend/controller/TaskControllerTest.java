@@ -79,13 +79,13 @@ class TaskControllerTest {
     void testGetTask() throws Exception {
         Task task = new Task();
         task.setId(1L);
-        task.setTitle("Fetch Me");
+        task.setTitle("New Task");
 
         when(taskService.getTaskById(1L)).thenReturn(Optional.of(task));
 
         mockMvc.perform(get("/api/tasks/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Fetch Me"));
+                .andExpect(jsonPath("$.title").value("New Task"));
     }
     
     @Test
@@ -145,4 +145,31 @@ class TaskControllerTest {
 
         verify(taskService, times(1)).updateStatus(task.getId(), Task.Status.COMPLETED);
     }
+    
+    @Test
+    void testGetTasksByStatus() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Completed Task");
+        task.setStatus(Task.Status.COMPLETED);
+        
+        Task task2 = new Task();
+        task2.setId(2L);
+        task2.setTitle("In Progress Task");
+        task2.setStatus(Task.Status.IN_PROGRESS);
+        
+        Task task3 = new Task();
+        task3.setId(3L);
+        task3.setTitle("Completed Task 2");
+        task3.setStatus(Task.Status.COMPLETED);
+
+        List<Task> completedTasks = List.of(task, task3);
+        when(taskService.getTasksByStatus(Task.Status.COMPLETED)).thenReturn(Optional.of(completedTasks));
+
+        mockMvc.perform(get("/api/tasks/status/{status}", "COMPLETED"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].title").value("Completed Task"))
+        .andExpect(jsonPath("$[1].title").value("Completed Task 2"));
+    }
+    
 }
