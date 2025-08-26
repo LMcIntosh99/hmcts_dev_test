@@ -45,7 +45,7 @@ class TaskServiceTest {
     void testUpdateStatus() {
         Task task = new Task();
         task.setId(1L);
-        task.setTitle("Old Task");
+        task.setTitle("Test Task");
         task.setStatus(Task.Status.PENDING);
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
@@ -61,7 +61,7 @@ class TaskServiceTest {
     void testGetTaskById() {
         Task task = new Task();
         task.setId(1L);
-        task.setTitle("Fetch Me");
+        task.setTitle("Test Task");
 
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
@@ -69,7 +69,17 @@ class TaskServiceTest {
 
         assertThat(result).isPresent();
         assertThat(result.get().getId()).isEqualTo(1L);
-        assertThat(result.get().getTitle()).isEqualTo("Fetch Me");
+        assertThat(result.get().getTitle()).isEqualTo("Test Task");
         verify(taskRepository, times(1)).findById(1L);
+    }
+    
+    @Test
+    void testGetTaskById_NotFound() {
+        when(taskRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Optional<Task> result = taskService.getTaskById(99L);
+
+        assertThat(result).isNotPresent();
+        verify(taskRepository, times(1)).findById(99L);
     }
 }
