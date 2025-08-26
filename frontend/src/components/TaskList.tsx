@@ -43,57 +43,34 @@ const TaskList: React.FC = () => {
     }
   };  
 
+  const renderTask = (task: Task) => (
+    <li key={task.id}>
+      <strong>{task.title}</strong> - Due: {task.dueDateTime}
+      <select
+        value={task.status}
+        onChange={(e) =>
+          handleStatusChange(task.id!, e.target.value as Task["status"])
+        }
+      >
+        <option value="PENDING">Pending</option>
+        <option value="IN_PROGRESS">In Progress</option>
+        <option value="COMPLETED">Completed</option>
+      </select>
+      <button onClick={() => handleDelete(task.id!)}>Delete</button>
+      <p>{task.description}</p>
+    </li>
+  );
+
   return (
     <div>
-      <ul>
-        <h2>Pending Tasks</h2>
-        {pendingTasks.map((task) => (
-          <li key={task.id}>
-            <strong>{task.title}</strong> - Due:{" "}
-            {task.dueDateTime}
-            <button
-              onClick={() =>
-                handleStatusChange(task.id!, nextStatus(task.status))
-              }
-            >
-              Start Task
-            </button>
-            <button onClick={() => handleDelete(task.id!)}>Delete</button>
-            <p>{task.description}</p>
-          </li>
-        ))}
-        <h2>In Progress Tasks</h2>
-        {inProgressTasks.map((task) => (
-          <li key={task.id}>
-            <strong>{task.title}</strong> - Due:{" "}
-            {task.dueDateTime}
-            <button
-              onClick={() =>
-                handleStatusChange(task.id!, nextStatus(task.status))
-              }
-            >
-              Complete Task
-            </button>
-            <button onClick={() => handleDelete(task.id!)}>Delete</button>
-            <p>{task.description}</p>
-          </li>
-        ))}
-        <h2>Completed Tasks</h2>
-        {completedTasks.map((task) => (
-          <li key={task.id}>
-            <strong>{task.title}</strong>
-            <button
-              onClick={() =>
-                handleStatusChange(task.id!, nextStatus(task.status))
-              }
-            >
-              Toggle Status
-            </button>
-            <button onClick={() => handleDelete(task.id!)}>Delete</button>
-            <p>{task.description}</p>
-          </li>
-        ))}
-      </ul>
+      <h2>Pending Tasks</h2>
+      <ul>{pendingTasks.map(renderTask)}</ul>
+
+      <h2>In Progress Tasks</h2>
+      <ul>{inProgressTasks.map(renderTask)}</ul>
+
+      <h2>Completed Tasks</h2>
+      <ul>{completedTasks.map(renderTask)}</ul>
     </div>
   );
 };
