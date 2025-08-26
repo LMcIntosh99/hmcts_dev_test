@@ -16,3 +16,7 @@ export const deleteTask = (id: number) => axios.delete(`${API_URL}/${id}`);
 
 export const getTasksByStatus = (status: Task["status"]) =>
     axios.get<Task[]>(`${API_URL}/status/${status}`);
+
+export const updateTask = (id: number, updatedFields: Partial<Pick<Task, "title" | "description" | "dueDateTime">>) =>
+  axios.patch<Task>(`${API_URL}/${id}`, updatedFields);
+
