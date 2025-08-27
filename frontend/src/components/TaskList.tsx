@@ -11,21 +11,40 @@ const TaskList: React.FC = () => {
   });
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editedTask, setEditedTask] = useState<Partial<Task>>({});
+  const [error, setError] = useState<string | null>(null);
 
   const fetchTasks = async () => {
-    const res = await getTasks();
-    setTasks(res.data);
+    try {
+      const res = await getTasks();
+      setTasks(res.data);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to fetch tasks:", err);
+      setError("Failed to fetch tasks. Please try again.");
+    }
   };
 
   const handleStatusChange = async (id: number, status: Task["status"] | "NONE") => {
-    if (status === "NONE") return; 
-    await updateTaskStatus(id, status);
-    fetchTasks();
+    if (status === "NONE") return;
+    try {
+      await updateTaskStatus(id, status);
+      await fetchTasks();
+      setError(null);
+    } catch (err) {
+      console.error("Failed to update task status:", err);
+      setError("Failed to update task status.");
+    }
   };
 
   const handleDelete = async (id: number) => {
-    await deleteTask(id);
-    fetchTasks();
+    try {
+      await deleteTask(id);
+      await fetchTasks();
+      setError(null);
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+      setError("Failed to delete task.");
+    }
   };
 
   const handleEdit = (task: Task) => {
@@ -34,10 +53,16 @@ const TaskList: React.FC = () => {
   };
 
   const handleSave = async (id: number) => {
-    await updateTask(id, editedTask);
-    setEditingTaskId(null);
-    setEditedTask({});
-    fetchTasks();
+    try {
+      await updateTask(id, editedTask);
+      setEditingTaskId(null);
+      setEditedTask({});
+      await fetchTasks();
+      setError(null);
+    } catch (err) {
+      console.error("Failed to save task:", err);
+      setError("Failed to save task.");
+    }
   };
 
   const handleCancel = () => {
@@ -132,6 +157,7 @@ const TaskList: React.FC = () => {
 
   return (
     <div>
+      {error && <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>}
       {(["PENDING", "IN_PROGRESS", "COMPLETED"] as Task["status"][]).map(
         (status) => (
           <div key={status}>
