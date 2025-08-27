@@ -1,26 +1,31 @@
 package com.example.backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
 public class Task {
+    public enum Status {
+        PENDING, IN_PROGRESS, COMPLETED
+    }
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title is required")
     private String title;
     
     private String description;
 
+    @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @NotNull(message = "Due Date and Time is required")
+    @Future(message = "Due date must be in the future")
     private LocalDateTime dueDateTime;
-
-    public enum Status {
-        PENDING, IN_PROGRESS, COMPLETED
-    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

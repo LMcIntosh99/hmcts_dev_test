@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.exception.TaskNotFoundException;
 import com.example.backend.model.Task;
 import com.example.backend.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class TaskController {
 
     // Create Task
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
+    public Task createTask(@Valid @RequestBody Task task) {
         return taskService.createTask(task);
     }
 

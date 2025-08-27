@@ -40,7 +40,7 @@ class TaskControllerTest {
         task.setId(1L);
         task.setTitle("New Task");
         task.setStatus(Task.Status.PENDING);
-        task.setDueDateTime(LocalDateTime.now());
+        task.setDueDateTime(LocalDateTime.now().plusDays(1));
 
         when(taskService.createTask(any(Task.class))).thenReturn(task);
 
@@ -52,12 +52,68 @@ class TaskControllerTest {
     }
     
     @Test
+    void testCreateTask_BlankTitle() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle(""); // invalid
+        task.setStatus(Task.Status.PENDING);
+        task.setDueDateTime(LocalDateTime.now().plusDays(1));
+
+        mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    void testCreateTask_NullStatus() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Title"); 
+        task.setStatus(null); // invalid
+        task.setDueDateTime(LocalDateTime.now().plusDays(1));
+
+        mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testCreateTask_NullDueDateTime() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Title"); 
+        task.setStatus(Task.Status.PENDING); 
+        task.setDueDateTime(null);  // invalid
+
+        mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    void testCreateTask_PastDueDateTime() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Title"); 
+        task.setStatus(Task.Status.PENDING); 
+        task.setDueDateTime(LocalDateTime.now().minusDays(1));  // Past due date invalid
+
+        mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(task)))
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
     void testDeleteTask() throws Exception {
         Task task = new Task();
         task.setId(1L);
         task.setTitle("New Task");
         task.setStatus(Task.Status.PENDING);
-        task.setDueDateTime(LocalDateTime.now());
+        task.setDueDateTime(LocalDateTime.now().plusDays(1));
 
         when(taskService.createTask(any(Task.class))).thenReturn(task);
 
